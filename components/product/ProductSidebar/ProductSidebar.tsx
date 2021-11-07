@@ -4,6 +4,9 @@ import { FC, useEffect, useState } from 'react'
 import { ProductOptions } from '@components/product'
 import type { Product } from '@commerce/types/product'
 import { Button, Text, Rating, Collapse, useUI } from '@components/ui'
+const redis = require('redis');
+const DEFAULT_EXPIRATION = 3600;
+
 import {
   getProductVariant,
   selectDefaultOptionFromProduct,
@@ -27,17 +30,33 @@ const ProductSidebar: FC<ProductSidebarProps> = ({ product, className }) => {
 
   const variant = getProductVariant(product, selectedOptions)
   const addToCart = async () => {
-    setLoading(true)
-    try {
-      await addItem({
-        productId: String(product.id),
-        variantId: String(variant ? variant.id : product.variants[0].id),
-      })
-      openSidebar()
-      setLoading(false)
-    } catch (err) {
-      setLoading(false)
-    }
+    // setLoading(true)
+    // try {
+    //   await addItem({
+    //     productId: String(product.id),
+    //     variantId: String(variant ? variant.id : product.variants[0].id),
+    //   })
+    //   openSidebar()
+    //   setLoading(false)
+    // } catch (err) {
+    //   setLoading(false)
+    // }
+    console.log('caled');
+    const client = redis.createClient({
+      host: 'localhost',
+      port: 6379,
+      password: '88901'
+    });
+    client.connect();
+    const data = {
+      item: String(product.name),
+      price: String(product.price),
+      image: String(product.images[0].url),
+    };
+
+    await client.set('cart', JSON.stringify(data));
+    console.log("addded");
+
   }
 
   return (
@@ -56,6 +75,18 @@ const ProductSidebar: FC<ProductSidebarProps> = ({ product, className }) => {
         <div className="text-accent-6 pr-1 font-medium text-sm">36 reviews</div>
       </div>
       <div>
+        <Button
+          aria-label="Add to Cart"
+          type="button"
+          className={s.button}
+          onClick={addToCart}
+          loading={loading}
+          disabled={variant?.availableForSale === false}
+        >
+          {variant?.availableForSale === false
+            ? 'Not Available'
+            : 'Add To Cart'}
+        </Button>
         {process.env.COMMERCE_CART_ENABLED && (
           <Button
             aria-label="Add to Cart"

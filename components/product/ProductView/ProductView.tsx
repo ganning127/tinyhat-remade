@@ -10,10 +10,12 @@ import { ProductSlider, ProductCard } from '@components/product'
 import { Container, Text } from '@components/ui'
 import ProductSidebar from '../ProductSidebar'
 import ProductTag from '../ProductTag'
+
 interface ProductViewProps {
   product: Product
   relatedProducts: Product[]
 }
+
 
 const ProductView: FC<ProductViewProps> = ({ product, relatedProducts }) => {
   const { price } = usePrice({

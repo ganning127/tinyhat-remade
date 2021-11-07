@@ -6,7 +6,33 @@ import { Layout } from '@components/common'
 import { Button, Text } from '@components/ui'
 import { Bag, Cross, Check, MapPin, CreditCard } from '@components/icons'
 import { CartItem } from '@components/cart'
+const redis = require('redis');
+const DEFAULT_EXPIRATION = 3600;
 
+/*
+  "cart" key in redis can be used to store a JSON object of 
+      - item
+      - price
+      - image
+*/
+async function createRedis() {
+  const client = redis.createClient();
+  client.connect();
+  client.on("error", function (error: any) {
+    console.error(error);
+  });
+
+  const data = await client.get("cart");
+  console.log(data);
+  return data;
+  // if (data) {
+  //   return JSON.parse(data);
+  // }
+}
+
+
+
+createRedis();
 export async function getStaticProps({
   preview,
   locale,

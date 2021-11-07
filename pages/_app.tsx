@@ -18,7 +18,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <ChakraProvider>
-
       <Head />
       <ManagedUIContext>
         <Layout pageProps={pageProps}>
